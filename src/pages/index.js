@@ -153,7 +153,6 @@ export default function Home() {
               value={intervals}
               cols={30}
               rows={6}
-              required
             />
           </div>
         </div>
@@ -165,7 +164,7 @@ export default function Home() {
           target="_blank"
           rel="noopener noreferrer"
         >
-          Feito por Rogim Nazário
+          Made by Rogim Nazário (Github)
         </a>
       </footer>
     </div>
