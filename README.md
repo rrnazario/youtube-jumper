@@ -1,2 +1,4 @@
-# youtube-non-stop
-For you that like listening long music videos without those parts when people keep talking in the middle.
+# Youtube Jumper
+
+For you that like going straight at the point on videos.
+Add intervals and the video will jump automatically among them.

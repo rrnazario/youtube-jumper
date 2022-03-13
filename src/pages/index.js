@@ -129,18 +129,18 @@ export default function Home() {
           </div>
 
           <div>
-            <div for="intervals" className={styles.tooltip}>
+            <div className={styles.tooltip}>
               Help, I need somebody!
               <span className={styles.tooltiptext}>
-                Formato: Origem -> Destino
+                Format: From -> To
                 <br /><br />
-                Exemplo: 17:49 -> 25:50
+                Example: 17:49 -> 25:50
                 <br />
-                (No momento 17:49, o video pulará automaticamente para 25:50)
+                (When video hits 17:49 time, it will automatically jump to 25:50)
                 <br /><br />
-                Adicione quantas linhas quiser :)
+                Add as any lines as you want :)
                 <br /><br />
-                Exemplo:<br />
+                Example:<br />
                 17:49 -> 25:50 <br />
                 44:18 -> 1:01:00
                 </span>
