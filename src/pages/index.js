@@ -34,25 +34,46 @@ export default function Home() {
     if (!localId) {
       clearInterval(loop);
       setLoop(null);
+      setIntervals(null);
+      setIntervalArray(null);
+    }
+    else {
+      const localIntervals = localStorage.getItem(localId);
+
+      if (localIntervals && localIntervals !== '') {
+        const localArray = generateIntervalObjects(localIntervals);
+
+        setIntervalArray(localArray);
+        setIntervals(localIntervals);
+      }
+
     }
 
-    console.log(localId);
     setId(localId);
   }
 
   const onIntervalsChange = (e) => {
     //17:49 -> 25:50
     //44:18 -> 1:01:00
+    const localArray = generateIntervalObjects(e.target.value);
+
+    if (localArray && localArray.length > 0 && id)
+      localStorage.setItem(id, e.target.value);
+
+    setIntervalArray(localArray);
+    setIntervals(e.target.value);
+  }
+
+  const generateIntervalObjects = (strIntervals) => {
     const localArray = []
 
-    e.target.value.split("\n").forEach(line => {
+    strIntervals.split("\n").forEach(line => {
       const newInterval = Interval(line);
       if (isValidInterval(newInterval))
         localArray = [...localArray, newInterval];
     })
 
-    setIntervalArray(localArray);
-    setIntervals(e.target.value);
+    return localArray;
   }
 
   const isValidInterval = (interval) => {
@@ -103,7 +124,7 @@ export default function Home() {
 
       <main className={styles.main}>
         <h1 className={styles.title}>
-          📻 Youtube Jumper 📻
+          {'📻 Youtube Jumper 📻'}
         </h1>
 
         <p className={styles.description}>
