@@ -138,7 +138,7 @@ export default function Home() {
                 <br />
                 (When video hits 17:49 time, it will automatically jump to 25:50)
                 <br /><br />
-                Add as any lines as you want :)
+                Add as many lines as you want :)
                 <br /><br />
                 Example:<br />
                 17:49 -> 25:50 <br />
