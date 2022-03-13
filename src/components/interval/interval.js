@@ -17,14 +17,27 @@ const Interval = (text) => {
         return totalTime;
     }
 
+    const isValid = () => {
+        if (raw.indexOf("->") === -1)
+            return false;
+
+        return true;
+    }
+
     return {
         Begin: () => {
+
+            if (!isValid())
+                return 0;
             //raw: 44:18 -> 1:01:00
             const str = raw.split("->")[0] //44:18;
 
             return calcTime(str);
         },
         End: () => {
+            if (!isValid())
+                return 0;
+
             const str = raw.split("->")[1] //44:18;
 
             return calcTime(str);
