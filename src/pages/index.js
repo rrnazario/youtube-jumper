@@ -2,7 +2,7 @@ import Head from 'next/head'
 import styles from '../styles/Home.module.css'
 import YouTube from 'react-youtube'
 import { useState } from 'react'
-import Interval from '../components/interval/index-interval';
+import Interval from '../components/interval/interval';
 
 export default function Home() {
   const [id, setId] = useState();
