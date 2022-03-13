@@ -107,7 +107,7 @@ export default function Home() {
         </h1>
 
         <p className={styles.description}>
-          Please, don't stop the music!
+          {'Please, don\'t stop the music!'}
         </p>
 
         <div className={styles.grid}>
@@ -132,17 +132,17 @@ export default function Home() {
             <div className={styles.tooltip}>
               Help, I need somebody!
               <span className={styles.tooltiptext}>
-                Format: From -> To
+                {'Format: From -> To'}
                 <br /><br />
-                Example: 17:49 -> 25:50
+                {'Example: 17:49 -> 25:50'}
                 <br />
-                (When video hits 17:49 time, it will automatically jump to 25:50)
+                {'(When video hits 17:49 time, it will automatically jump to 25:50)'}
                 <br /><br />
-                Add as many lines as you want :)
+                {'Add as many lines as you want :)'}
                 <br /><br />
-                Example:<br />
-                17:49 -> 25:50 <br />
-                44:18 -> 1:01:00
+                {'Example:'}<br />
+                {'17:49 -> 25:50 '}<br />
+                {'44:18 -> 1:01:00'}
                 </span>
             </div>
             <textarea
