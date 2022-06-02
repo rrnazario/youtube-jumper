@@ -16,29 +16,25 @@ export default function Home() {
     e.target.pauseVideo();
   }
 
-  const onYoutubeUrlChange = (e) => {
-    setYtUrl(e.target.value);
-    console.log(e.target.value);
+  const onYoutubeUrlChange = (value) => {
+    setYtUrl(value);
 
-    const youtubeUrls = ["youtu.be/", "youtube.com/watch?v="]
-    let localId = "";
+    if (value === "") return;
 
-    youtubeUrls.forEach(url => {
-      const ytindex = e.target.value.indexOf(url);
-      if (ytindex >= 0) {
-        localId = e.target.value.substring(ytindex + url.length);
-        return;
-      }
-    });
+    const invalidChars = ["?v=", "/", "?v%3D"]
 
-    if (!localId) {
+    const reg = new RegExp(/\?v\=([\_\-a-zA-Z\d]{10,})|\/([\_\-a-zA-Z\d]{10,})|\?v\%3D([\_\-a-zA-Z\d]{10,})/)
+    const results = reg.exec(value)
+                       .filter(f => f !== undefined && !invalidChars.some(s => f.indexOf(s) >= 0))
+
+    if (!results.length) {
       clearInterval(loop);
       setLoop(null);
       setIntervals(null);
       setIntervalArray(null);
     }
     else {
-      const localIntervals = localStorage.getItem(localId);
+      const localIntervals = localStorage.getItem(results[0]);
 
       if (localIntervals && localIntervals !== '') {
         const localArray = generateIntervalObjects(localIntervals);
@@ -46,10 +42,9 @@ export default function Home() {
         setIntervalArray(localArray);
         setIntervals(localIntervals);
       }
-
     }
 
-    setId(localId);
+    setId(results[0]);
   }
 
   const onIntervalsChange = (e) => {
@@ -90,7 +85,7 @@ export default function Home() {
 
     if (id && e.data === 1 && !loop) {
       await setLoop(setInterval((video, arrIntervals) => {
-        
+
         arrIntervals.forEach(inter => {
           const currTime = video.getCurrentTime();
           console.log(`Curr: ${currTime}, Begin ${inter.Begin()}, End: ${inter.End()}`)
@@ -98,7 +93,7 @@ export default function Home() {
           if (inter.Begin() <= currTime && inter.End() > currTime) {
             console.log(`Changing ${inter.Begin()}`)
             e.target.loadVideoById(id, inter.End());
-            
+
             return;
           }
         });
@@ -107,7 +102,7 @@ export default function Home() {
     }
   }
 
-  const opts = {    
+  const opts = {
     width: '100%',
     playerVars: {
       autoplay: 1,
@@ -138,7 +133,7 @@ export default function Home() {
               type="text"
               className={styles.urltext}
               placeholder="Youtube URL"
-              onChange={onYoutubeUrlChange}
+              onChange={(e) => onYoutubeUrlChange(e.target.value)}
               value={ytUrl}
               required
             />
@@ -164,7 +159,7 @@ export default function Home() {
                 {'Example:'}<br />
                 {'17:49 -> 25:50 '}<br />
                 {'44:18 -> 1:01:00'}
-                </span>
+              </span>
             </div>
             <textarea
               name="intervals"
@@ -179,7 +174,7 @@ export default function Home() {
         </div>
       </main>
 
-      <footer className={styles.footer}>        
+      <footer className={styles.footer}>
         <a
           href="https://github.com/rrnazario/youtube-non-stop"
           target="_blank"
