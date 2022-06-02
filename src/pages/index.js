@@ -106,6 +106,8 @@ export default function Home() {
     width: '100%',
     playerVars: {
       autoplay: 1,
+      controls: 2,
+      modestbranding: 1
     },
   };
 
