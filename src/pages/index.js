@@ -11,21 +11,31 @@ export default function Home() {
   const [intervalArray, setIntervalArray] = useState([]);
   const [loop, setLoop] = useState();
 
+  const [videoObj, setVideoObj] = useState();
+
+  const [capturing, setCapturing] = useState(false);
+  const [capturingInterval, setCapturingInterval] = useState({});
+  const [captureCaption, setCaptureCaption] = useState('Capture time');
+
   const onReady = async (e) => {
 
     e.target.pauseVideo();
   }
 
+
   const onYoutubeUrlChange = (value) => {
     setYtUrl(value);
 
-    if (value === "") return;
+    if (value === "") {
+      setId(undefined);
+      return;
+    }
 
     const invalidChars = ["?v=", "/", "?v%3D"]
 
     const reg = new RegExp(/\?v\=([\_\-a-zA-Z\d]{10,})|\/([\_\-a-zA-Z\d]{10,})|\?v\%3D([\_\-a-zA-Z\d]{10,})/)
     const results = reg.exec(value)
-                       .filter(f => f !== undefined && !invalidChars.some(s => f.indexOf(s) >= 0))
+      .filter(f => f !== undefined && !invalidChars.some(s => f.indexOf(s) >= 0))
 
     if (!results.length) {
       clearInterval(loop);
@@ -76,19 +86,18 @@ export default function Home() {
     const end = interval.End();
     const valid = begin < end && end > 0;
 
-    //console.log(`Valid? ${valid}`);
     return valid;
   }
 
   const onStateChange = async (e) => {
-    console.log(e);
+    console.debug(e);
 
     if (id && e.data === 1 && !loop) {
       await setLoop(setInterval((video, arrIntervals) => {
 
         arrIntervals.forEach(inter => {
           const currTime = video.getCurrentTime();
-          console.log(`Curr: ${currTime}, Begin ${inter.Begin()}, End: ${inter.End()}`)
+          console.debug(`Curr: ${currTime}, Begin ${inter.Begin()}, End: ${inter.End()}`)
 
           if (inter.Begin() <= currTime && inter.End() > currTime) {
             console.log(`Changing ${inter.Begin()}`)
@@ -99,6 +108,30 @@ export default function Home() {
         });
 
       }, 1000, e.target, intervalArray));
+    }
+  }
+
+  const onCaptureInterval = async () => {
+    if (!id || !videoObj) return;
+
+    if (capturing) { //get end
+      setCaptureCaption('Capture time');
+
+      setCapturing(false);
+      let newInterval = { ...capturingInterval, End: videoObj.getCurrentTime() };
+      setCapturingInterval(newInterval);
+
+      const strInterval = `${newInterval.Begin} -> ${newInterval.End}`
+
+      newInterval = Interval(strInterval);
+      await setIntervals(`${intervals}\n${newInterval.Stringify()}`)
+      await setIntervalArray([...intervalArray, newInterval])
+    }
+    else { //get begin
+      await setCapturing(true);
+      await setCaptureCaption('Capturing...');
+
+      await setCapturingInterval({ Begin: videoObj.getCurrentTime() })
     }
   }
 
@@ -143,6 +176,7 @@ export default function Home() {
               videoId={id}
               opts={opts}
               onReady={onReady}
+              onPlay={e => setVideoObj(e.target)}
               onStateChange={onStateChange} />}
           </div>
 
@@ -173,6 +207,10 @@ export default function Home() {
               rows={6}
             />
           </div>
+
+          {id && <div className={styles.button} onClick={onCaptureInterval}>
+            {captureCaption}
+          </div>}
         </div>
       </main>
 

@@ -24,6 +24,26 @@ const Interval = (text) => {
         return true;
     }
 
+    const stringify = () => {
+        if (raw.indexOf(':') === -1) {
+            const firstPart = extractIntervalPartFromFloat(raw.split("->")[0]);
+            const secondPart = extractIntervalPartFromFloat(raw.split("->")[1]);
+
+            return `${firstPart} -> ${secondPart}`;
+        }
+
+        return raw;
+    }
+
+    const extractIntervalPartFromFloat = (strFloat) => {
+        const floatInterval = parseFloat(strFloat);
+
+        const floatPart = parseInt(floatInterval % 60);
+        const intPart = parseInt(floatInterval / 60);
+
+        return `${intPart}:${floatPart}`
+    }
+
     return {
         Begin: () => {
 
@@ -42,6 +62,8 @@ const Interval = (text) => {
 
             return calcTime(str);
         },
+
+        Stringify: () => stringify()
     }
 }
 
