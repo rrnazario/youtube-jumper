@@ -1,6 +1,6 @@
 # Youtube Jumper
 
-For you that like going straight at the point on videos.
+For you who like going straight at the point on videos.
 
 Add intervals and the video will jump automatically among them.
 
