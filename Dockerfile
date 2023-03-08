@@ -13,7 +13,7 @@ RUN npm ci && npm run build && npm prune --production
 
 # ---
 
-FROM alpine as production
+FROM node:16 as production
 
 ENV NODE_ENV production
 
