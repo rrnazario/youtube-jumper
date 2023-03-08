@@ -3,6 +3,7 @@ import styles from '../styles/Home.module.css'
 import YouTube from 'react-youtube'
 import { useState } from 'react'
 import Interval from '../components/interval/interval';
+import intervalService from '../components/infrastructure/interval.service'
 
 export default function Home() {
   const [id, setId] = useState();
@@ -44,17 +45,36 @@ export default function Home() {
       setIntervalArray(null);
     }
     else {
-      const localIntervals = localStorage.getItem(results[0]);
+      if (!TryGetLocalIntervals(results[0])) {
 
-      if (localIntervals && localIntervals !== '') {
-        const localArray = generateIntervalObjects(localIntervals);
+        intervalService().get(results[0])
+          .then(async response => {
+            if (response && response.data !== '') {
+              const localArray = generateIntervalObjects(response.data);
 
-        setIntervalArray(localArray);
-        setIntervals(localIntervals);
+              await setIntervalArray(localArray);
+              await setIntervals(response.data);
+            }
+          });
       }
     }
 
     setId(results[0]);
+  }
+
+  const TryGetLocalIntervals = (youtubeId) => {
+    const localIntervals = localStorage.getItem(youtubeId);
+
+    if (localIntervals && localIntervals !== '') {
+      const localArray = generateIntervalObjects(localIntervals);
+
+      setIntervalArray(localArray);
+      setIntervals(localIntervals);
+
+      return true;
+    }
+
+    return false;
   }
 
   const onIntervalsChange = (e) => {
@@ -62,8 +82,11 @@ export default function Home() {
     //44:18 -> 1:01:00
     const localArray = generateIntervalObjects(e.target.value);
 
-    if (localArray && localArray.length > 0 && id)
+    if (localArray && localArray.length > 0 && id) {
+      intervalService().add(id, { intervals: e.target.value });
+
       localStorage.setItem(id, e.target.value);
+    }
 
     setIntervalArray(localArray);
     setIntervals(e.target.value);
