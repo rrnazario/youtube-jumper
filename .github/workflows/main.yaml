@@ -6,6 +6,7 @@ on:
       - master
     paths:
       - "youtube-jumper-api/**"
+      - "Dockerfile"
 jobs:
   build:
     runs-on: ubuntu-latest    
