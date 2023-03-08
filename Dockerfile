@@ -4,7 +4,8 @@ ENV NODE_ENV build
 
 WORKDIR /home/node
 
-COPY ./youtube-jumper-api /home/node
+COPY /youtube-jumper-api /home/node
+RUN ls /home/node
 
 RUN apk add --no-cache \
         npm
