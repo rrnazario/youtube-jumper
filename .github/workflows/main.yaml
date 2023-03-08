@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - master
+    paths:
+      - "youtube-jumper-api/**"
 jobs:
   build:
     runs-on: ubuntu-latest    
