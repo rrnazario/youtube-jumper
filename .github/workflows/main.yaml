@@ -4,10 +4,6 @@ on:
   push:
     branches:
       - master
-defaults:
-  run:
-    working-directory: ./youtube-jumper-api
-
 jobs:
   build:
     runs-on: ubuntu-latest    
