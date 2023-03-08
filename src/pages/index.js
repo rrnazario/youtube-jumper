@@ -3,6 +3,7 @@ import styles from '../styles/Home.module.css'
 import YouTube from 'react-youtube'
 import { useState } from 'react'
 import Interval from '../components/interval/interval';
+import { intervalService } from '../components/infrastructure/interval.service'
 
 export default function Home() {
   const [id, setId] = useState();
@@ -44,17 +45,31 @@ export default function Home() {
       setIntervalArray(null);
     }
     else {
-      const localIntervals = localStorage.getItem(results[0]);
+      intervalService().get(results[0])
+        .then(async intervals => {
+          if (intervals && intervals !== '') {
+            const localArray = generateIntervalObjects(intervals);
 
-      if (localIntervals && localIntervals !== '') {
-        const localArray = generateIntervalObjects(localIntervals);
-
-        setIntervalArray(localArray);
-        setIntervals(localIntervals);
-      }
+            await setIntervalArray(localArray);
+            await setIntervals(intervals);
+          }
+          else TryGetLocalIntervals(results[0]);
+        })
+        .catch(_ => TryGetLocalIntervals(results[0]));
     }
 
     setId(results[0]);
+  }
+
+  const TryGetLocalIntervals = (youtubeId) => {
+    const localIntervals = localStorage.getItem(youtubeId);
+
+    if (localIntervals && localIntervals !== '') {
+      const localArray = generateIntervalObjects(localIntervals);
+
+      setIntervalArray(localArray);
+      setIntervals(localIntervals);
+    }
   }
 
   const onIntervalsChange = (e) => {
