@@ -57,9 +57,10 @@
 
 .tooltip {
   position: relative;
-  display: inline-block;
+  display: flex;
+  flex-direction: row-reverse;
+  cursor: pointer;
   font-size: 12px;
-  border-bottom: 1px dotted black;
 }
 
 .tooltip .tooltiptext {
@@ -73,7 +74,6 @@
   position: absolute;
   z-index: 1;
   bottom: 100%;
-  left: 50%;
   margin-left: -60px;
 
   opacity: 0;

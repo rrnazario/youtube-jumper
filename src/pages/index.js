@@ -40,7 +40,7 @@ export default function Home() {
     if (!results.length) {
       clearInterval(loop);
       setLoop(null);
-      setIntervals(null);
+      setIntervals([]);
       setIntervalArray(null);
     }
     else {
@@ -115,16 +115,21 @@ export default function Home() {
     if (!id || !videoObj) return;
 
     if (capturing) { //get end
-      setCaptureCaption('Capture time');
+      await setCaptureCaption('Capture time');
 
-      setCapturing(false);
+      await setCapturing(false);
       let newInterval = { ...capturingInterval, End: videoObj.getCurrentTime() };
-      setCapturingInterval(newInterval);
+      await setCapturingInterval(newInterval);
 
       const strInterval = `${newInterval.Begin} -> ${newInterval.End}`
 
       newInterval = Interval(strInterval);
-      await setIntervals(`${intervals}\n${newInterval.Stringify()}`)
+
+      if (!intervals)
+        await setIntervals(`${newInterval.Stringify()}`)
+      else
+        await setIntervals(`${intervals}\n${newInterval.Stringify()}`)
+
       await setIntervalArray([...intervalArray, newInterval])
     }
     else { //get begin
