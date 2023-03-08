@@ -7,6 +7,7 @@ on:
     paths:
       - "youtube-jumper-api/**"
       - "Dockerfile"
+      - ".github/**"
 jobs:
   build:
     runs-on: ubuntu-latest    
