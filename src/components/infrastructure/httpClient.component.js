@@ -2,11 +2,8 @@ import axios from 'axios';
 import { API_URL } from '../../config/env';
 
 export default function httpClient() {
-    let token = localStorage.getItem('token');
-
     const defaultOptions = {
         headers: {
-            Authorization: token ? `Bearer ${token}` : '',
             'Content-Type': 'application/json',
         },
         baseURL: API_URL,
