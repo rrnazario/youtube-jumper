@@ -1,0 +1,23 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - "youtube-jumper-api/**"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest    
+    defaults:
+      run:
+        working-directory: ./youtube-jumper-api
+    steps:
+      - uses: actions/checkout@v2
+      - uses: akhileshns/heroku-deploy@v3.12.12        
+        with:
+          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
+          heroku_app_name: "youtube-jumper-api"
+          heroku_email: "rrnazario@gmail.com"
+          usedocker: true
