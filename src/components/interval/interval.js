@@ -17,11 +17,32 @@ const Interval = (text) => {
         return totalTime;
     }
 
-    const isValid = () => {
-        if (raw.indexOf("->") === -1)
-            return false;
+    const isFormatted = raw.indexOf("->") !== -1;
 
-        return true;
+    const begin = () => {
+        if (!isFormatted)
+            return 0;
+        //raw: 44:18 -> 1:01:00
+        const str = raw.split("->")[0] //44:18;
+
+        return calcTime(str);
+    }
+
+    const end = () => {
+        if (!isFormatted)
+            return 0;
+
+        const str = raw.split("->")[1] //44:18;
+
+        return calcTime(str);
+    }
+
+    const isValid = () => {
+        if (!isFormatted) return false;
+
+        const bg = begin();
+        const ed = end();
+        return bg < ed && ed > 0;
     }
 
     const stringify = () => {
@@ -45,25 +66,10 @@ const Interval = (text) => {
     }
 
     return {
-        Begin: () => {
-
-            if (!isValid())
-                return 0;
-            //raw: 44:18 -> 1:01:00
-            const str = raw.split("->")[0] //44:18;
-
-            return calcTime(str);
-        },
-        End: () => {
-            if (!isValid())
-                return 0;
-
-            const str = raw.split("->")[1] //44:18;
-
-            return calcTime(str);
-        },
-
-        Stringify: () => stringify()
+        Begin: () => begin(),
+        End: () => end(),
+        Stringify: () => stringify(),
+        IsValid: isValid()
     }
 }
 
