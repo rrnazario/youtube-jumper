@@ -20,6 +20,13 @@
   align-items: center;
 }
 
+.infoArea {
+  display: flex;
+  padding: 10px;
+  justify-content: space-between;
+  align-items: center;
+}
+
 .footer a {
   display: flex;
   justify-content: center;
