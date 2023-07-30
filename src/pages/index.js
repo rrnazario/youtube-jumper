@@ -14,6 +14,8 @@ export default function Home() {
 
   const [videoObj, setVideoObj] = useState();
 
+  const [checkingIntervalsOnServer, setCheckingIntervalsOnServer] = useState(false);
+
   const [capturing, setCapturing] = useState(false);
   const [capturingInterval, setCapturingInterval] = useState({});
   const [captureCaption, setCaptureCaption] = useState('Capture time');
@@ -34,8 +36,8 @@ export default function Home() {
 
     const invalidChars = ["?v=", "/", "?v%3D"]
 
-    const reg = new RegExp(/\?v\=([\_\-a-zA-Z\d]{10,})|\/([\_\-a-zA-Z\d]{10,})|\?v\%3D([\_\-a-zA-Z\d]{10,})/)
-    const results = reg.exec(value)
+    const youtubeIdsRegExExtractor = new RegExp(/\?v\=([\_\-a-zA-Z\d]{10,})|\/([\_\-a-zA-Z\d]{10,})|\?v\%3D([\_\-a-zA-Z\d]{10,})/)
+    const results = youtubeIdsRegExExtractor.exec(value)
       .filter(f => f !== undefined && !invalidChars.some(s => f.indexOf(s) >= 0))
 
     if (!results.length) {
@@ -46,6 +48,7 @@ export default function Home() {
     }
     else {
       if (!TryGetLocalIntervals(results[0])) {
+        setCheckingIntervalsOnServer(true);
 
         intervalService().get(results[0])
           .then(async response => {
@@ -55,7 +58,10 @@ export default function Home() {
               await setIntervalArray(localArray);
               await setIntervals(response.data);
             }
-          });
+
+            setCheckingIntervalsOnServer(false);
+          })
+          .catch(() => setCheckingIntervalsOnServer(false));
       }
     }
 
@@ -97,19 +103,12 @@ export default function Home() {
 
     strIntervals.split("\n").forEach(line => {
       const newInterval = Interval(line);
-      if (isValidInterval(newInterval))
+
+      if (newInterval.IsValid)
         localArray = [...localArray, newInterval];
     })
 
     return localArray;
-  }
-
-  const isValidInterval = (interval) => {
-    const begin = interval.Begin();
-    const end = interval.End();
-    const valid = begin < end && end > 0;
-
-    return valid;
   }
 
   const onStateChange = async (e) => {
@@ -137,33 +136,38 @@ export default function Home() {
   const onCaptureInterval = async () => {
     if (!id || !videoObj) return;
 
-    if (capturing) { //get end
-      await setCaptureCaption('Capture time');
-
-      await setCapturing(false);
-      let newInterval = { ...capturingInterval, End: videoObj.getCurrentTime() };
-      await setCapturingInterval(newInterval);
-
-      const strInterval = `${newInterval.Begin} -> ${newInterval.End}`
-
-      newInterval = Interval(strInterval);
-
-      if (!intervals)
-        await setIntervals(`${newInterval.Stringify()}`)
-      else
-        await setIntervals(`${intervals}\n${newInterval.Stringify()}`)
-
-      await setIntervalArray([...intervalArray, newInterval])
-    }
-    else { //get begin
-      await setCapturing(true);
-      await setCaptureCaption('Capturing...');
-
-      await setCapturingInterval({ Begin: videoObj.getCurrentTime() })
-    }
+    capturing
+      ? await captureEnd()
+      : await captureBegin();
   }
 
-  const opts = {
+  const captureEnd = async () => {
+    await setCaptureCaption('Capture time');
+
+    await setCapturing(false);
+    let newInterval = { ...capturingInterval, End: videoObj.getCurrentTime() };
+    await setCapturingInterval(newInterval);
+
+    const strInterval = `${newInterval.Begin} -> ${newInterval.End}`
+
+    newInterval = Interval(strInterval);
+
+    if (!intervals)
+      await setIntervals(`${newInterval.Stringify()}`)
+    else
+      await setIntervals(`${intervals}\n${newInterval.Stringify()}`)
+
+    await setIntervalArray([...intervalArray, newInterval])
+  }
+
+  const captureBegin = async () => {
+    await setCapturing(true);
+    await setCaptureCaption('Capturing...');
+
+    await setCapturingInterval({ Begin: videoObj.getCurrentTime() })
+  }
+
+  const youtubeOpts = {
     width: '100%',
     playerVars: {
       autoplay: 1,
@@ -202,7 +206,7 @@ export default function Home() {
             />
             {ytUrl && <YouTube
               videoId={id}
-              opts={opts}
+              opts={youtubeOpts}
               onReady={onReady}
               onPlay={e => setVideoObj(e.target)}
               onStateChange={onStateChange} />}
@@ -235,9 +239,11 @@ export default function Home() {
               rows={6}
             />
           </div>
-
-          {id && <div className={styles.button} onClick={onCaptureInterval}>
-            {captureCaption}
+          {id && <div className={styles.infoArea}>
+            <div className={styles.button} onClick={onCaptureInterval}>
+              {captureCaption}
+            </div>
+            {checkingIntervalsOnServer && <div>Checking server...</div>}
           </div>}
         </div>
       </main>
