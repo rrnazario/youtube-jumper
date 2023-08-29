@@ -9,6 +9,7 @@ export default function Home() {
   const [id, setId] = useState();
   const [ytUrl, setYtUrl] = useState();
   const [shareYtUrl, setShareYtUrl] = useState();
+  const [shareYtUrlCaption, setShareYtUrlCaption] = useState('Click to copy the share URL:');
   const [intervals, setIntervals] = useState();
   const [intervalArray, setIntervalArray] = useState([]);
   const [loop, setLoop] = useState();
@@ -262,7 +263,8 @@ export default function Home() {
             </div>
             {checkingIntervalsOnServer && <div>Checking server...</div>}
           </div>}
-          {id && <input
+          {id && <div>
+            {shareYtUrlCaption} <input
             name="shareyoutubeurl"
             type="text"
             className={styles.urltext}
@@ -272,9 +274,9 @@ export default function Home() {
             readOnly
             onClick={() => {
               navigator.clipboard.writeText(shareYtUrl);
-              alert('URL copied!');
+              setShareYtUrlCaption('Copied!');
             }}
-          />}
+          /></div>}
         </div>
       </main>
 
