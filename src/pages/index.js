@@ -1,13 +1,15 @@
 import Head from 'next/head'
 import styles from '../styles/Home.module.css'
 import YouTube from 'react-youtube'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Interval from '../components/interval/interval';
 import intervalService from '../components/infrastructure/interval.service'
 
 export default function Home() {
   const [id, setId] = useState();
   const [ytUrl, setYtUrl] = useState();
+  const [shareYtUrl, setShareYtUrl] = useState();
+  const [shareYtUrlCaption, setShareYtUrlCaption] = useState('Click to copy the share URL:');
   const [intervals, setIntervals] = useState();
   const [intervalArray, setIntervalArray] = useState([]);
   const [loop, setLoop] = useState();
@@ -20,11 +22,24 @@ export default function Home() {
   const [capturingInterval, setCapturingInterval] = useState({});
   const [captureCaption, setCaptureCaption] = useState('Capture time');
 
+  useEffect(() => {
+    const sessionYtUrl = localStorage.getItem("ytUrl");
+    if (sessionYtUrl) {
+      localStorage.clear("ytUrl");
+      onYoutubeUrlChange(sessionYtUrl);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (intervals) {
+      setShareYtUrl(`${window.location.origin}/share/${id}`);
+    }
+  }, [intervals]);
+
   const onReady = async (e) => {
 
     e.target.pauseVideo();
   }
-
 
   const onYoutubeUrlChange = (value) => {
     setYtUrl(value);
@@ -37,14 +52,16 @@ export default function Home() {
     const invalidChars = ["?v=", "/", "?v%3D"]
 
     const youtubeIdsRegExExtractor = new RegExp(/\?v\=([\_\-a-zA-Z\d]{10,})|\/([\_\-a-zA-Z\d]{10,})|\?v\%3D([\_\-a-zA-Z\d]{10,})/)
-    const results = youtubeIdsRegExExtractor.exec(value)
-      .filter(f => f !== undefined && !invalidChars.some(s => f.indexOf(s) >= 0))
+    let results = youtubeIdsRegExExtractor.exec(value);
 
-    if (!results.length) {
+    results = results?.filter(f => f !== undefined && !invalidChars.some(s => f.indexOf(s) >= 0))
+
+    if (!results || !results.length) {
       clearInterval(loop);
       setLoop(null);
       setIntervals([]);
       setIntervalArray(null);
+      setYtUrl(null);
     }
     else {
       if (!TryGetLocalIntervals(results[0])) {
@@ -65,7 +82,8 @@ export default function Home() {
       }
     }
 
-    setId(results[0]);
+    if (results)
+      setId(results[0]);
   }
 
   const TryGetLocalIntervals = (youtubeId) => {
@@ -245,6 +263,20 @@ export default function Home() {
             </div>
             {checkingIntervalsOnServer && <div>Checking server...</div>}
           </div>}
+          {id && <div>
+            {shareYtUrlCaption} <input
+            name="shareyoutubeurl"
+            type="text"
+            className={styles.urltext}
+            placeholder="Share this video with your friends!"
+            value={shareYtUrl}
+            required
+            readOnly
+            onClick={() => {
+              navigator.clipboard.writeText(shareYtUrl);
+              setShareYtUrlCaption('Copied!');
+            }}
+          /></div>}
         </div>
       </main>
 
